@@ -29,16 +29,16 @@ io.on('connection', (socket) => {
         if (!task) return;
 
         // Add task to Redis
-        await client.rPush(REDIS_OBJ_KEY, JSON.stringify({ taskName: task.trim(), storage: "redis" }));
+        await client.rPush(REDIS_OBJ_KEY, JSON.stringify({ taskName: task.trim(), storeage: "redis" }));
 
         // Check Redis length
         const taskCount = await client.lLen(REDIS_OBJ_KEY);
 
         if (taskCount > 10) {
             const tasks = await client.lRange(REDIS_OBJ_KEY, 0, -1);
-            const parsedTasks = tasks.map(name => ({
+            const parsedTasks = tasks.map(data => ({
                 taskId: v4(),
-                taskName: name
+                taskName: JSON.parse(data).taskName
             }));
 
             await TaskModel.insertMany(parsedTasks);
@@ -53,7 +53,7 @@ const taskRoute = require("./routes/taskRoute");
 
 app.use("/api/v1", taskRoute);
 
-const PORT = 8000;
+const PORT = process.env.PORT;
 server.listen(PORT, () => {
     console.log(`Server running on ${PORT}`);
 });
