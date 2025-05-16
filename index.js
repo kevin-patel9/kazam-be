@@ -34,7 +34,7 @@ io.on('connection', (socket) => {
         // Check Redis length
         const taskCount = await client.lLen(REDIS_OBJ_KEY);
 
-        if (taskCount > 10) {
+        if (taskCount > 50) {
             const tasks = await client.lRange(REDIS_OBJ_KEY, 0, -1);
             const parsedTasks = tasks.map(data => ({
                 taskId: v4(),
